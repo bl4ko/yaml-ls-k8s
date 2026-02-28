@@ -115,7 +115,7 @@ func (p *Proxy) handleConfigRequest(msg *lsp.BaseMessage, data []byte) {
 	if msg.ID != nil {
 		idStr := string(*msg.ID)
 		p.tracker.Track(idStr, "workspace/configuration")
-		p.logger.Printf("tracking workspace/configuration request id=%s", idStr)
+		p.logger.Printf("tracking workspace/configuration request id=%s params=%s", idStr, msg.Params)
 	}
 	p.sendToEditor(data)
 }

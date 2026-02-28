@@ -134,6 +134,8 @@ func (p *Proxy) interceptConfigResponse(msg *lsp.BaseMessage, data []byte) {
 		return
 	}
 
+	p.logger.Printf("config response before injection: %s", msg.Result)
+
 	// Convert schema map: schema → list of URIs → schema → single glob or URI string
 	yamlSchemas := make(map[string]interface{})
 	for schema, uris := range schemaMap {
@@ -144,28 +146,33 @@ func (p *Proxy) interceptConfigResponse(msg *lsp.BaseMessage, data []byte) {
 		}
 	}
 
-	// Inject into each result object that has a "yaml" section
-	for i, raw := range results {
+	// yamlls requests workspace/configuration with items like [{"section": "yaml"}].
+	// Neovim responds with an array where each element is the VALUE of that section.
+	// So for "yaml" section, the element is {"schemas": {...}, "schemaStore": {...}},
+	// NOT {"yaml": {"schemas": {...}}}. We inject schemas directly into the first element.
+	if len(results) > 0 {
 		var obj map[string]interface{}
-		if err := json.Unmarshal(raw, &obj); err != nil {
-			// If it's not an object, try to create one
+		if err := json.Unmarshal(results[0], &obj); err != nil {
 			obj = make(map[string]interface{})
 		}
 
-		// Ensure yaml section exists
-		yamlSection, ok := obj["yaml"].(map[string]interface{})
-		if !ok {
-			yamlSection = make(map[string]interface{})
+		// Merge our schemas with any existing schemas from editor config
+		existingSchemas, _ := obj["schemas"].(map[string]interface{})
+		if existingSchemas == nil {
+			existingSchemas = make(map[string]interface{})
 		}
-		yamlSection["schemas"] = yamlSchemas
-		obj["yaml"] = yamlSection
+		for k, v := range yamlSchemas {
+			existingSchemas[k] = v
+		}
+		obj["schemas"] = existingSchemas
 
 		newRaw, err := json.Marshal(obj)
 		if err != nil {
 			p.logger.Printf("failed to marshal injected config: %v", err)
-			continue
+			p.sendToServer(data)
+			return
 		}
-		results[i] = newRaw
+		results[0] = newRaw
 	}
 
 	newResult, err := json.Marshal(results)
@@ -187,7 +194,6 @@ func (p *Proxy) interceptConfigResponse(msg *lsp.BaseMessage, data []byte) {
 		return
 	}
 
-	schemasJSON, _ := json.Marshal(yamlSchemas)
-	p.logger.Printf("injected yaml.schemas: %s", schemasJSON)
+	p.logger.Printf("config response after injection: %s", newResult)
 	p.sendToServer(modified)
 }
