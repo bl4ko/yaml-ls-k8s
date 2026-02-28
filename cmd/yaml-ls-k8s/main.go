@@ -43,7 +43,7 @@ func main() {
 
 	// Set up detection chain
 	downloader := schema.NewDownloader(30*time.Second, 1*time.Hour)
-	cache := schema.NewCache(cfg.CacheDir, downloader, logger)
+	cache := schema.NewCache(cfg.CacheDir, downloader, logger, cfg.K8sVersion)
 	composite := schema.NewCompositeBuilder(cfg.CacheDir, logger)
 	chain := detector.NewChain(
 		kubernetes.NewK8sDetector(cfg.K8sVersion),

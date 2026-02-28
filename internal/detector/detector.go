@@ -2,7 +2,8 @@ package detector
 
 // SchemaResult represents a detected schema for a document.
 type SchemaResult struct {
-	URL string // Remote URL for the schema
+	URL   string // Remote URL for the schema
+	IsCRD bool   // True if this is a CRD schema (needs ObjectMeta wrapping)
 }
 
 // Detector detects schemas from YAML document content.

@@ -39,10 +39,16 @@ func (p *Proxy) detectAndNotify(uri string) {
 		return
 	}
 
-	// Download/cache each schema
+	// Download/cache each schema (CRDs get ObjectMeta wrapping)
 	var fileURIs []string
 	for _, r := range results {
-		fileURI, err := deps.Cache.Ensure(r.URL)
+		var fileURI string
+		var err error
+		if r.IsCRD {
+			fileURI, err = deps.Cache.EnsureCRD(r.URL)
+		} else {
+			fileURI, err = deps.Cache.Ensure(r.URL)
+		}
 		if err != nil {
 			p.logger.Printf("schema fetch failed for %s: %v", r.URL, err)
 			continue

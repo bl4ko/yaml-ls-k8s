@@ -69,6 +69,9 @@ kind: Gateway`,
 				if r.URL != tt.wantURLs[i] {
 					t.Errorf("result[%d].URL = %s, want %s", i, r.URL, tt.wantURLs[i])
 				}
+				if !r.IsCRD {
+					t.Errorf("result[%d].IsCRD = false, want true", i)
+				}
 			}
 		})
 	}

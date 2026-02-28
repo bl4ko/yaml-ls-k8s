@@ -32,7 +32,7 @@ func (d *CRDDetector) Detect(content string) []detector.SchemaResult {
 		url := d.buildURL(meta)
 		if url != "" && !seen[url] {
 			seen[url] = true
-			results = append(results, detector.SchemaResult{URL: url})
+			results = append(results, detector.SchemaResult{URL: url, IsCRD: true})
 		}
 	}
 	return results
