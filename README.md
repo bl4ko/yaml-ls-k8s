@@ -30,11 +30,27 @@ yaml-ls-k8s sits between your editor and yaml-language-server, intercepting LSP 
 
 ### Prerequisites
 
-- Go 1.21+
-- [yaml-language-server](https://github.com/redhat-developer/yaml-language-server):
-  ```bash
-  npm install -g yaml-language-server
-  ```
+[yaml-language-server](https://github.com/redhat-developer/yaml-language-server) must be installed:
+
+```bash
+npm install -g yaml-language-server
+```
+
+### Download binary
+
+Pre-built binaries for Linux and macOS (amd64/arm64) are available on the [releases page](https://github.com/bl4ko/yaml-ls-k8s/releases):
+
+```bash
+# Example: macOS ARM64 (Apple Silicon)
+curl -sL https://github.com/bl4ko/yaml-ls-k8s/releases/latest/download/yaml-ls-k8s-darwin-arm64.tar.gz | tar xz
+mv yaml-ls-k8s ~/.local/bin/
+```
+
+### go install
+
+```bash
+go install github.com/bl4ko/yaml-ls-k8s/cmd/yaml-ls-k8s@latest
+```
 
 ### From source
 

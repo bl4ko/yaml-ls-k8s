@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}/${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: amd64
+          - os: linux
+            arch: arm64
+          - os: darwin
+            arch: amd64
+          - os: darwin
+            arch: arm64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Build binary
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+        run: go build -ldflags "-s -w" -o yaml-ls-k8s ./cmd/yaml-ls-k8s
+      - name: Package
+        run: tar czf yaml-ls-k8s-${{ matrix.os }}-${{ matrix.arch }}.tar.gz yaml-ls-k8s
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yaml-ls-k8s-${{ matrix.os }}-${{ matrix.arch }}
+          path: yaml-ls-k8s-${{ matrix.os }}-${{ matrix.arch }}.tar.gz
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Upload to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: gh release upload "$TAG" yaml-ls-k8s-*.tar.gz --repo "$GITHUB_REPOSITORY"
