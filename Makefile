@@ -13,7 +13,7 @@ install: build
 test: test-unit test-e2e
 
 test-unit:
-	go test ./internal/lsp/ ./internal/proxy/ ./internal/detector/...
+	go test ./internal/lsp/ ./internal/proxy/ ./internal/detector/... ./internal/schema/
 
 test-e2e: build
 	go test ./internal/e2e/ -timeout 120s

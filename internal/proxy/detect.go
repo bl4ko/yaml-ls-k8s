@@ -1,6 +1,8 @@
 package proxy
 
 import (
+	"errors"
+
 	"github.com/bl4ko/yaml-ls-k8s/internal/detector"
 	"github.com/bl4ko/yaml-ls-k8s/internal/schema"
 )
@@ -40,7 +42,9 @@ func (p *Proxy) detectAndNotify(uri string) {
 	}
 
 	// Download/cache each schema (CRDs get ObjectMeta wrapping)
+	multiDoc := len(results) > 1
 	var fileURIs []string
+	realSchemaCount := 0
 	for _, r := range results {
 		var fileURI string
 		var err error
@@ -51,9 +55,24 @@ func (p *Proxy) detectAndNotify(uri string) {
 		}
 		if err != nil {
 			p.logger.Printf("schema fetch failed for %s: %v", r.URL, err)
+			if multiDoc && errors.Is(err, schema.ErrNotFound) {
+				// Use permissive schema so yamlls doesn't apply a real schema to this doc
+				permURI, permErr := deps.Cache.PermissiveSchemaURI()
+				if permErr != nil {
+					p.logger.Printf("permissive schema failed: %v", permErr)
+					continue
+				}
+				fileURIs = append(fileURIs, permURI)
+			}
 			continue
 		}
+		realSchemaCount++
 		fileURIs = append(fileURIs, fileURI)
+	}
+
+	// No real schemas found — don't assign a composite of only permissive schemas
+	if realSchemaCount == 0 {
+		return
 	}
 
 	if len(fileURIs) == 0 {

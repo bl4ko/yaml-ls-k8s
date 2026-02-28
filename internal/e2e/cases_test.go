@@ -3,6 +3,7 @@ package e2e
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -135,6 +136,58 @@ spec:
 	}
 	if !contains(labels, "aws") {
 		t.Errorf("expected 'aws' in provider completions, got: %v", labels)
+	}
+}
+
+func TestE2E_MultiDoc_Mixed404_200(t *testing.T) {
+	requireYamlLS(t)
+	binary := findBinary(t)
+	cacheDir := t.TempDir()
+
+	c := newLSPClient(t, binary, cacheDir)
+	defer c.close()
+	c.initialize()
+
+	// GatewayParameters (404) + Gateway (200) + ListenerPolicy (404)
+	uri := "file:///tmp/e2e_multidoc_mixed.yaml"
+	content := `apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayParameters
+metadata:
+  name: gw-params
+spec:
+  kube:
+    deployment:
+      replicas: 1
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gw
+spec:
+  gatewayClassName: kgateway
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: ListenerPolicy
+metadata:
+  name: listener-policy
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: gw
+`
+	c.openFile(uri, content)
+	time.Sleep(8 * time.Second)
+
+	diags := c.getDiagnostics(uri)
+	for _, d := range diags {
+		if strings.Contains(d.Message, "Missing property") || strings.Contains(d.Message, "is not allowed") {
+			t.Errorf("unexpected false diagnostic: %s", d.Message)
+		}
 	}
 }
 

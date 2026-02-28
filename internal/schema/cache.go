@@ -23,6 +23,9 @@ type Cache struct {
 
 	objectMetaOnce sync.Once
 	objectMeta     json.RawMessage // cached ObjectMeta schema extracted from core K8s
+
+	permissiveOnce sync.Once
+	permissiveURI  string // cached file:// URI for the permissive ({}) schema
 }
 
 func NewCache(dir string, downloader *Downloader, logger *log.Logger, k8sVersion string) *Cache {
@@ -184,6 +187,33 @@ func (c *Cache) getObjectMeta() (json.RawMessage, error) {
 		return nil, fmt.Errorf("ObjectMeta not available")
 	}
 	return c.objectMeta, nil
+}
+
+// PermissiveSchemaURI returns a file:// URI to a permissive JSON schema ({})
+// that accepts any document. Created once and reused for all subsequent calls.
+func (c *Cache) PermissiveSchemaURI() (string, error) {
+	var retErr error
+	c.permissiveOnce.Do(func() {
+		dir := filepath.Join(c.dir, "_internal")
+		if err := os.MkdirAll(dir, 0o755); err != nil {
+			retErr = fmt.Errorf("creating internal schema dir: %w", err)
+			return
+		}
+		p := filepath.Join(dir, "permissive.json")
+		if err := os.WriteFile(p, []byte("{}"), 0o644); err != nil {
+			retErr = fmt.Errorf("writing permissive schema: %w", err)
+			return
+		}
+		c.permissiveURI = pathToFileURI(p)
+		c.logger.Printf("created permissive schema: %s", p)
+	})
+	if retErr != nil {
+		return "", retErr
+	}
+	if c.permissiveURI == "" {
+		return "", fmt.Errorf("permissive schema not available")
+	}
+	return c.permissiveURI, nil
 }
 
 func pathToFileURI(path string) string {
