@@ -106,6 +106,23 @@ Configured in `~/.config/nvim/lua/plugins/lspconfig.lua`:
 - `mason = false` — required. With `mason = true`, LazyVim delegates `vim.lsp.enable()` to mason-lspconfig's `automatic_enable`, which doesn't trigger for custom `cmd` binaries not installed by Mason.
 - `root_markers = {".git"}` + `single_file_support = true` — required. The lspconfig-style `root_dir` function is NOT compatible with the native `vim.lsp.config()` API that LazyVim uses. `root_markers` is the native equivalent, and `single_file_support` ensures attachment even outside git repos.
 
+## Versioning & Releases
+
+Version is stored in `cmd/yaml-ls-k8s/main.go` (`var version = "X.Y.Z"`). When releasing:
+
+1. Update the `version` variable in `cmd/yaml-ls-k8s/main.go`
+2. Commit: `chore: bump version to vX.Y.Z`
+3. Tag: `git tag vX.Y.Z && git push origin vX.Y.Z`
+4. Create GitHub release: `gh release create vX.Y.Z --generate-notes`
+
+## CI
+
+GitHub Actions workflow (`.github/workflows/ci.yml`) runs on PRs targeting `main`:
+- **Lint**: `go vet`
+- **Unit Tests**: all internal packages
+- **E2E Tests**: full LSP pipeline (installs `yaml-language-server` via npm)
+- **Build**: compiles binary and verifies `--version`
+
 ## Schema Sources
 
 - **Core K8s**: `https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/{version}-standalone-strict/{kind}-{group}-{version}.json`
