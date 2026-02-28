@@ -96,11 +96,15 @@ make install        # Build + copy to ~/.local/bin/
 - trailing-whitespace, end-of-file-fixer, check-yaml, check-json
 - go build, go vet, go test (unit + e2e)
 
-## Neovim Integration
+## Neovim Integration (LazyVim)
 
 Configured in `~/.config/nvim/lua/plugins/lspconfig.lua`:
 - `yamlls.cmd = {"yaml-ls-k8s", "--yamlls-path", "yaml-language-server"}` for direct YAML files
 - `helm_ls.yamlls.path = "yaml-ls-k8s"` for Helm templates (helm-ls renders templates, passes clean YAML to yaml-ls-k8s)
+
+**Critical lspconfig settings** (LazyVim + native `vim.lsp.config()` API):
+- `mason = false` — required. With `mason = true`, LazyVim delegates `vim.lsp.enable()` to mason-lspconfig's `automatic_enable`, which doesn't trigger for custom `cmd` binaries not installed by Mason.
+- `root_markers = {".git"}` + `single_file_support = true` — required. The lspconfig-style `root_dir` function is NOT compatible with the native `vim.lsp.config()` API that LazyVim uses. `root_markers` is the native equivalent, and `single_file_support` ensures attachment even outside git repos.
 
 ## Schema Sources
 
