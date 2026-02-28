@@ -32,9 +32,10 @@ func (p *Proxy) detectAndNotify(uri string) {
 
 	results := deps.Chain.Detect(content)
 	if len(results) == 0 {
-		// Clear any previous schemas for this URI
-		p.state.SetSchemas(uri, nil)
-		p.sendDidChangeConfiguration()
+		if changed := p.state.SetSchemas(uri, nil); changed {
+			p.logger.Printf("cleared schemas for %s", uri)
+			p.sendDidChangeConfiguration()
+		}
 		return
 	}
 
@@ -60,6 +61,8 @@ func (p *Proxy) detectAndNotify(uri string) {
 		return
 	}
 
-	p.state.SetSchemas(uri, []string{schemaURI})
-	p.sendDidChangeConfiguration()
+	if changed := p.state.SetSchemas(uri, []string{schemaURI}); changed {
+		p.logger.Printf("schema for %s → %s", uri, schemaURI)
+		p.sendDidChangeConfiguration()
+	}
 }

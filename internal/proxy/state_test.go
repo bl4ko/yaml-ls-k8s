@@ -57,6 +57,35 @@ func TestState_ApplyChange_Insert(t *testing.T) {
 	}
 }
 
+func TestState_SetSchemas_ChangedDetection(t *testing.T) {
+	s := NewState()
+
+	// First set should report changed
+	if changed := s.SetSchemas("file:///a.yaml", []string{"file:///schema/deploy.json"}); !changed {
+		t.Error("first SetSchemas should return true")
+	}
+
+	// Same value should report not changed
+	if changed := s.SetSchemas("file:///a.yaml", []string{"file:///schema/deploy.json"}); changed {
+		t.Error("same SetSchemas should return false")
+	}
+
+	// Different value should report changed
+	if changed := s.SetSchemas("file:///a.yaml", []string{"file:///schema/svc.json"}); !changed {
+		t.Error("different SetSchemas should return true")
+	}
+
+	// Clear should report changed
+	if changed := s.SetSchemas("file:///a.yaml", nil); !changed {
+		t.Error("clear SetSchemas should return true")
+	}
+
+	// Clear again should report not changed
+	if changed := s.SetSchemas("file:///a.yaml", nil); changed {
+		t.Error("second clear SetSchemas should return false")
+	}
+}
+
 func TestState_BuildSchemaMap(t *testing.T) {
 	s := NewState()
 

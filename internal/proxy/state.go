@@ -36,10 +36,34 @@ func (s *State) DeleteContent(uri string) {
 	delete(s.schemas, uri)
 }
 
-func (s *State) SetSchemas(uri string, schemas []string) {
+// SetSchemas updates the schemas for a URI. Returns true if the mapping changed.
+func (s *State) SetSchemas(uri string, schemas []string) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.schemas[uri] = schemas
+
+	old := s.schemas[uri]
+	if slicesEqual(old, schemas) {
+		return false
+	}
+
+	if len(schemas) == 0 {
+		delete(s.schemas, uri)
+	} else {
+		s.schemas[uri] = schemas
+	}
+	return true
+}
+
+func slicesEqual(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // BuildSchemaMap returns the aggregated yaml.schemas map: schema → [uri, ...].

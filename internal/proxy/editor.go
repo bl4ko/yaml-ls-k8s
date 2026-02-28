@@ -187,6 +187,7 @@ func (p *Proxy) interceptConfigResponse(msg *lsp.BaseMessage, data []byte) {
 		return
 	}
 
-	p.logger.Printf("injected yaml.schemas with %d schema mappings", len(schemaMap))
+	schemasJSON, _ := json.Marshal(yamlSchemas)
+	p.logger.Printf("injected yaml.schemas: %s", schemasJSON)
 	p.sendToServer(modified)
 }
