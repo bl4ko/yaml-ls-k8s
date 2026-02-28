@@ -15,15 +15,23 @@ import (
 	"github.com/bl4ko/yaml-ls-k8s/internal/schema"
 )
 
+var version = "0.1.0"
+
 func main() {
 	cfg := config.DefaultConfig()
 
+	showVersion := flag.Bool("version", false, "print version and exit")
 	flag.StringVar(&cfg.YamlLSPath, "yamlls-path", cfg.YamlLSPath, "path to yaml-language-server binary")
 	flag.StringVar(&cfg.LogFile, "log-file", cfg.LogFile, "log file path")
 	flag.StringVar(&cfg.K8sVersion, "k8s-version", cfg.K8sVersion, "Kubernetes schema version")
 	flag.StringVar(&cfg.CacheDir, "cache-dir", cfg.CacheDir, "schema cache directory")
 	stdio := flag.Bool("stdio", true, "use stdio transport (ignored, for LSP client compat)")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println("yaml-ls-k8s " + version)
+		os.Exit(0)
+	}
 
 	_ = stdio // always stdio
 
