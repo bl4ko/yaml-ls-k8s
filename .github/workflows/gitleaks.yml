@@ -1,0 +1,8 @@
+name: gitleaks
+permissions:
+  contents: read
+on:
+  push:
+jobs:
+  scan:
+    uses: bl4ko/shared-actions/.github/workflows/gitleaks.yml@main
