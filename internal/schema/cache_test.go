@@ -11,7 +11,7 @@ import (
 func TestPermissiveSchemaURI(t *testing.T) {
 	dir := t.TempDir()
 	logger := log.New(os.Stderr, "test: ", 0)
-	c := NewCache(dir, nil, logger, "v1.33.0")
+	c := NewCache(dir, nil, logger, "v1.35.3")
 
 	uri, err := c.PermissiveSchemaURI()
 	if err != nil {

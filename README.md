@@ -126,7 +126,7 @@ yaml-ls-k8s communicates over stdio and implements the standard LSP protocol. An
 |------|---------|-------------|
 | `--yamlls-path` | `yaml-language-server` | Path to yaml-language-server binary |
 | `--log-file` | `~/.config/yaml-ls-k8s/server.log` | Log file path |
-| `--k8s-version` | `v1.33.0` | Kubernetes schema version |
+| `--k8s-version` | `v1.35.3` | Kubernetes schema version |
 | `--cache-dir` | `~/.cache/yaml-ls-k8s/schemas/` | Schema cache directory |
 
 ## Troubleshooting
@@ -145,7 +145,7 @@ rm -rf ~/.cache/yaml-ls-k8s/schemas/
 ```bash
 # Core K8s resource
 curl -s -o /dev/null -w "%{http_code}" \
-  "https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0-standalone-strict/deployment-apps-v1.json"
+  "https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.35.3-standalone-strict/deployment-apps-v1.json"
 
 # CRD
 curl -s -o /dev/null -w "%{http_code}" \

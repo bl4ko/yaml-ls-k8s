@@ -1,0 +1,38 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "baseBranches": ["main"],
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    ":pinDevDependencies"
+  ],
+  "platformAutomerge": true,
+  "minimumReleaseAge": "3 days",
+  "pre-commit": {
+    "enabled": true
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update K8sVersion default in internal/config/config.go",
+      "fileMatch": ["^internal/config/config\\.go$"],
+      "matchStrings": [
+        "//\\s*renovate:\\s*datasource=(?<datasource>\\S+)\\s+depName=(?<depName>\\S+)(?:\\s+extractVersion=(?<extractVersion>\\S+))?\\s*\\n\\s*K8sVersion:\\s*\"(?<currentValue>v\\d+\\.\\d+\\.\\d+)\""
+      ]
+    }
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest", "pinDigest"],
+      "automerge": true
+    },
+    {
+      "matchManagers": ["custom.regex"],
+      "matchDepNames": ["kubernetes/kubernetes"],
+      "groupName": "kubernetes schema version",
+      "automerge": true,
+      "commitMessageTopic": "kubernetes schema",
+      "extractVersion": "^(?<version>v\\d+\\.\\d+\\.\\d+)$"
+    }
+  ]
+}

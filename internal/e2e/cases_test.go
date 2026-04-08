@@ -175,10 +175,10 @@ kind: ListenerPolicy
 metadata:
   name: listener-policy
 spec:
-  targetRef:
-    group: gateway.networking.k8s.io
-    kind: Gateway
-    name: gw
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: gw
 `
 	c.openFile(uri, content)
 	time.Sleep(8 * time.Second)

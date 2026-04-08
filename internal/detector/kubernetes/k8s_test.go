@@ -5,7 +5,7 @@ import (
 )
 
 func TestK8sDetector_Detect(t *testing.T) {
-	d := NewK8sDetector("v1.33.0")
+	d := NewK8sDetector("v1.35.3")
 
 	tests := []struct {
 		name     string
@@ -17,7 +17,7 @@ func TestK8sDetector_Detect(t *testing.T) {
 			content: `apiVersion: apps/v1
 kind: Deployment`,
 			wantURLs: []string{
-				"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0-standalone-strict/deployment-apps-v1.json",
+				"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.35.3-standalone-strict/deployment-apps-v1.json",
 			},
 		},
 		{
@@ -25,7 +25,7 @@ kind: Deployment`,
 			content: `apiVersion: v1
 kind: Pod`,
 			wantURLs: []string{
-				"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0-standalone-strict/pod-v1.json",
+				"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.35.3-standalone-strict/pod-v1.json",
 			},
 		},
 		{
@@ -33,7 +33,7 @@ kind: Pod`,
 			content: `apiVersion: v1
 kind: Service`,
 			wantURLs: []string{
-				"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0-standalone-strict/service-v1.json",
+				"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.35.3-standalone-strict/service-v1.json",
 			},
 		},
 		{
@@ -57,8 +57,8 @@ kind: Deployment
 apiVersion: v1
 kind: Service`,
 			wantURLs: []string{
-				"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0-standalone-strict/deployment-apps-v1.json",
-				"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0-standalone-strict/service-v1.json",
+				"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.35.3-standalone-strict/deployment-apps-v1.json",
+				"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.35.3-standalone-strict/service-v1.json",
 			},
 		},
 		{
@@ -66,7 +66,7 @@ kind: Service`,
 			content: `apiVersion: batch/v1
 kind: CronJob`,
 			wantURLs: []string{
-				"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.33.0-standalone-strict/cronjob-batch-v1.json",
+				"https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.35.3-standalone-strict/cronjob-batch-v1.json",
 			},
 		},
 	}

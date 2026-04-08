@@ -72,7 +72,7 @@ CRD schemas from datreeio have `metadata: {"type": "object"}` with no properties
 |------|---------|---------|
 | `--yamlls-path` | `yaml-language-server` | Path to yamlls binary |
 | `--log-file` | `~/.config/yaml-ls-k8s/server.log` | Log file (never stdout) |
-| `--k8s-version` | `v1.33.0` | K8s schema version |
+| `--k8s-version` | `v1.35.3` | K8s schema version |
 | `--cache-dir` | `~/.cache/yaml-ls-k8s/schemas/` | Schema cache directory |
 | `--stdio` | `true` | Ignored, LSP client compat |
 

@@ -17,7 +17,8 @@ func DefaultConfig() *Config {
 	return &Config{
 		YamlLSPath: "yaml-language-server",
 		LogFile:    filepath.Join(home, ".config", "yaml-ls-k8s", "server.log"),
-		K8sVersion: "v1.33.0",
+		// renovate: datasource=github-releases depName=kubernetes/kubernetes
+		K8sVersion: "v1.35.3",
 		CacheDir:   filepath.Join(home, ".cache", "yaml-ls-k8s", "schemas"),
 	}
 }
