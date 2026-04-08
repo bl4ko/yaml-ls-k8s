@@ -38,7 +38,7 @@ jobs:
           go-version-file: go.mod
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 22
+          node-version: 24
       - run: npm install -g yaml-language-server
       - run: go build -o yaml-ls-k8s ./cmd/yaml-ls-k8s
       - run: go test ./internal/e2e/ -timeout 120s
