@@ -27,6 +27,11 @@
       "automerge": true
     },
     {
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["major"],
+      "automerge": true
+    },
+    {
       "matchManagers": ["custom.regex"],
       "matchDepNames": ["kubernetes/kubernetes"],
       "groupName": "kubernetes schema version",
