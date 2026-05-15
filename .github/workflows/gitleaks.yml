@@ -5,4 +5,4 @@ on:
   push:
 jobs:
   scan:
-    uses: bl4ko/shared-actions/.github/workflows/gitleaks.yml@de89e2288f98714acba15e59e7c2451c455dd0bc # main
+    uses: bl4ko/shared-actions/.github/workflows/gitleaks.yml@a93a5940342226db9243b62d3b87c79cd290086c # main
