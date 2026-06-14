@@ -80,7 +80,12 @@ func (p *Proxy) forceFullSync(syncRaw json.RawMessage, caps, result map[string]j
 	if err := json.Unmarshal(syncRaw, &syncKind); err == nil {
 		if syncKind == 2 {
 			p.logger.Printf("forcing textDocumentSync from Incremental(2) to Full(1)")
-			caps["textDocumentSync"], _ = json.Marshal(1)
+			full, err := json.Marshal(1)
+			if err != nil {
+				p.logger.Printf("failed to marshal textDocumentSync: %v", err)
+				return nil
+			}
+			caps["textDocumentSync"] = full
 			return p.rebuildResponse(caps, result, msg)
 		}
 		return nil
@@ -92,21 +97,45 @@ func (p *Proxy) forceFullSync(syncRaw json.RawMessage, caps, result map[string]j
 		if syncOpts.Change == 2 {
 			p.logger.Printf("forcing textDocumentSync.change from Incremental(2) to Full(1)")
 			syncOpts.Change = 1
-			caps["textDocumentSync"], _ = json.Marshal(syncOpts)
+			opts, err := json.Marshal(syncOpts)
+			if err != nil {
+				p.logger.Printf("failed to marshal textDocumentSync options: %v", err)
+				return nil
+			}
+			caps["textDocumentSync"] = opts
 			return p.rebuildResponse(caps, result, msg)
 		}
 	}
 	return nil
 }
 
+// rebuildResponse re-marshals the patched capabilities into a full response.
+// It returns nil on any marshal failure so the caller can fall back to
+// forwarding the original, unmodified message instead of a corrupt one.
 func (p *Proxy) rebuildResponse(caps, result map[string]json.RawMessage, msg *lsp.BaseMessage) []byte {
-	result["capabilities"], _ = json.Marshal(caps)
+	capsRaw, err := json.Marshal(caps)
+	if err != nil {
+		p.logger.Printf("failed to marshal capabilities: %v", err)
+		return nil
+	}
+	result["capabilities"] = capsRaw
+
+	resultRaw, err := json.Marshal(result)
+	if err != nil {
+		p.logger.Printf("failed to marshal result: %v", err)
+		return nil
+	}
+
 	response := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"id":      json.RawMessage(*msg.ID),
-		"result":  json.RawMessage(mustMarshal(result)),
+		"result":  json.RawMessage(resultRaw),
 	}
-	data, _ := json.Marshal(response)
+	data, err := json.Marshal(response)
+	if err != nil {
+		p.logger.Printf("failed to marshal response: %v", err)
+		return nil
+	}
 	return data
 }
 
@@ -129,12 +158,11 @@ func (p *Proxy) sendDidChangeConfiguration() {
 			"settings": map[string]interface{}{},
 		},
 	}
-	data, _ := json.Marshal(notification)
+	data, err := json.Marshal(notification)
+	if err != nil {
+		p.logger.Printf("failed to marshal didChangeConfiguration: %v", err)
+		return
+	}
 	p.sendToServer(data)
 	p.logger.Printf("sent didChangeConfiguration to yamlls")
-}
-
-func mustMarshal(v interface{}) []byte {
-	data, _ := json.Marshal(v)
-	return data
 }
