@@ -165,3 +165,5 @@ make install     # build + install to ~/.local/bin/
 ## License
 
 MIT
+
+<!-- forge-gate owner gate proof 2026-11-19 -->
