@@ -165,3 +165,5 @@ make install     # build + install to ~/.local/bin/
 ## License
 
 MIT
+
+forge-gate merge diff proof
