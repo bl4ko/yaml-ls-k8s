@@ -128,6 +128,7 @@ yaml-ls-k8s communicates over stdio and implements the standard LSP protocol. An
 | `--log-file` | `~/.config/yaml-ls-k8s/server.log` | Log file path |
 | `--k8s-version` | `v1.35.3` | Kubernetes schema version |
 | `--cache-dir` | `~/.cache/yaml-ls-k8s/schemas/` | Schema cache directory |
+| `--version` | `false` | Print the version and exit |
 
 ## Troubleshooting
 
