@@ -27,6 +27,14 @@ metadata:
 			want: []TypeMeta{{APIVersion: "v1", Kind: "Service"}},
 		},
 		{
+			name: "core v1 configmap",
+			content: `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: settings`,
+			want: []TypeMeta{{APIVersion: "v1", Kind: "ConfigMap"}},
+		},
+		{
 			name: "multi-document",
 			content: `apiVersion: apps/v1
 kind: Deployment
